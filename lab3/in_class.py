@@ -1,10 +1,11 @@
 import requests
 import bs4 as bs
+import json
 
 
 absolute_home_link = "https://999.md"
 relative_link = "/ro/list/real-estate/apartments-and-rooms?o_30_241=894&applied=1&eo=12900&eo=12912&eo=12885&eo=13859&ef=32&ef=33&o_33_1=776&page="
-max_pages = 3
+max_pages = 10
 
 
 def get_links(page_link, page, walked_pages=1) -> list:
@@ -26,7 +27,7 @@ def get_links(page_link, page, walked_pages=1) -> list:
             links.append(absolute_home_link + l)
 
     # If there are more pages and we haven't walked enough pages, get the links from the next page
-    if links != 0 and walked_pages < max_pages:
+    if links != 0 and (walked_pages < max_pages or max_pages == 0):
         return links + get_links(page_link, page + 1, walked_pages + 1)
 
     return links
@@ -34,8 +35,8 @@ def get_links(page_link, page, walked_pages=1) -> list:
 
 def main():
     links = get_links(absolute_home_link + relative_link, 10)
-    print(links)
-    print("Found " + str(len(links)) + " links.")
+    f = open("links.json", "w")
+    f.write(json.dumps(links, indent=4))
 
 
 if __name__ == '__main__':

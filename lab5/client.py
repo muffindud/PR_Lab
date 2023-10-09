@@ -14,19 +14,20 @@ def receive_message():
     while True:
         message = client_socket.recv(1024).decode('utf-8')
 
-        if not message:
-            break
+        if message:
+            message_payload = json.loads(message)
+            # print(message_payload)
 
-        message_payload = json.loads(message)
-
-        if message_payload["type"] == "notification":
-            print(message_payload["payload"]["message"])
-        elif message_payload["type"] == "message":
-            print("{} ({}): {}".format(
-                message_payload["payload"]["sender"],
-                message_payload["payload"]["room"],
-                message_payload["payload"]["text"]
-            ))
+            if message_payload["type"] == "connect_ack":
+                print(message_payload["payload"]["message"])
+            elif message_payload["type"] == "notification":
+                print(message_payload["payload"]["message"])
+            elif message_payload["type"] == "message":
+                print(
+                    message_payload["payload"]["sender"] + "@" +
+                    message_payload["payload"]["room"] + ": " +
+                    message_payload["payload"]["text"]
+                )
 
 
 def send_message():
@@ -34,25 +35,27 @@ def send_message():
     room = ""
     sender = ""
 
+    # TODO: Add connect_ack handling
     while True:
         message = input("")
         message_payload = {}
 
         if message.lower() == '/exit':
+            message_payload = {"type": "exit", "payload": {}}
             break
         elif message.lower() == '/help':
             print("'/exit' to quit the chat")
             print("'/leave' to leave the room")
             print("'/connect' to connect to a room")
             print("'/help' to display available commands")
-        elif message.lower()[0] == '/':
-            print("Unknown command, type '/help' to see a list of available commands.")
         elif not in_room:
             if message.lower() == '/connect':
+                in_room = True
                 sender = input("name: ")
                 room = input("room: ")
                 message_payload["type"] = "connect"
-                message_payload["payload"]["name"] = sender
+                message_payload["payload"] = {}
+                message_payload["payload"]["sender"] = sender
                 message_payload["payload"]["room"] = room
             else:
                 print("You are not in a room. Type '/connect' to enter a room.")
@@ -60,19 +63,24 @@ def send_message():
             if message.lower() == '/leave':
                 # TODO: Leave the room
                 message_payload["type"] = "disconnect"
+                message_payload["payload"] = {}
                 message_payload["payload"]["sender"] = sender
                 message_payload["payload"]["room"] = room
                 sender = ""
                 room = ""
+                in_room = False
             elif message.lower() == '/connect':
                 print("You are already in a room. Type '/leave' to exit the room.")
             else:
                 message_payload["type"] = "message"
+                message_payload["payload"] = {}
                 message_payload["payload"]["sender"] = sender
                 message_payload["payload"]["room"] = room
                 message_payload["payload"]["text"] = message
-        else:
-            client_socket.send(json.dumps(message_payload).encode('utf-8'))
+        elif message.lower()[0] == '/':
+            print("Unknown command, type '/help' to see a list of available commands.")
+
+        client_socket.send(json.dumps(message_payload).encode('utf-8'))
 
     client_socket.close()
 

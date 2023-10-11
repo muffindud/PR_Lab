@@ -41,7 +41,8 @@ def send_message():
         message_payload = {}
 
         if message.lower() == '/exit':
-            message_payload = {"type": "exit", "payload": {}}
+            message_payload = {"type": "exit", "payload": {"sender": sender, "room": room}}
+            client_socket.send(json.dumps(message_payload).encode('utf-8'))
             break
         elif message.lower() == '/help':
             print("'/exit' to quit the chat")
@@ -58,7 +59,7 @@ def send_message():
                 message_payload["payload"]["sender"] = sender
                 message_payload["payload"]["room"] = room
             else:
-                print("You are not in a room. Type '/connect' to enter a room.")
+                print("You are not in a room. Type '/connect' to enter a room or '/help' to see commands.")
         elif in_room:
             if message.lower() == '/leave':
                 # TODO: Leave the room
@@ -80,7 +81,8 @@ def send_message():
         elif message.lower()[0] == '/':
             print("Unknown command, type '/help' to see a list of available commands.")
 
-        client_socket.send(json.dumps(message_payload).encode('utf-8'))
+        if message_payload != {}:
+            client_socket.send(json.dumps(message_payload).encode('utf-8'))
 
     client_socket.close()
 

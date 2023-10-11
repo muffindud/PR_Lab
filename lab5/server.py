@@ -9,7 +9,7 @@ PORT = 8080
 
 # List of active clients
 rooms = {}
-clients =[]
+clients = []
 
 
 # Client handler
@@ -22,7 +22,7 @@ def handle_client(client_socket, client_address):
 
         if message:
             message_payload = json.loads(message)
-            print(message_payload)
+            print(json.dumps(message_payload, indent=4), end='\n\n')
             client_message_payload = {}
             m_type = message_payload["type"]
             m_payload = message_payload["payload"]

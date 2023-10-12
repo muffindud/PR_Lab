@@ -3,7 +3,7 @@ import threading
 import json
 import hashlib
 import base64
-
+from time import sleep
 
 # Host parameters
 HOST = '127.0.0.1'
@@ -99,40 +99,31 @@ def send_message():
                 elif message.lower().split()[0] == '/upload':
                     try:
                         with open(message.split()[1], "rb") as file:
+                            file_name = message.split()[1].split("/")[-1]
                             file_hash = hash_file(message.split()[1])
                             message_payload["type"] = "upload"
                             message_payload["payload"] = {}
                             message_payload["payload"]["sender"] = sender
                             message_payload["payload"]["room"] = room
-                            message_payload["payload"]["file_name"] = message.split()[1].split("/")[-1]
+                            message_payload["payload"]["file_name"] = file_name
                             message_payload["payload"]["file_hash"] = file_hash
                             client_socket.send(json.dumps(message_payload).encode('utf-8'))
 
                             encoded_image = base64.b64encode(open(message.split()[1], "rb").read()).decode("utf-8")
                             n = 0
+                            file_id = sender + "@" + room + "@" + file_name + "@"
+                            blob_size = 1024 - len(file_id)
                             while True:
-                                try:
-                                    blob = encoded_image[n:n + 256]
-                                except IndexError:
+                                blob = encoded_image[n * blob_size: (n + 1) * blob_size]
+                                # print("Enc: ", len(blob))
+                                # print("Blb: ", len(file_id + "@" + blob))
+                                if blob == "":
                                     break
-                                file_payload = {"type": "file", "payload": {}}
-                                file_payload["payload"]["sender"] = sender
-                                file_payload["payload"]["room"] = room
-                                file_payload["payload"]["piece"] = int(n / 256)
-                                file_payload["payload"]["file_hash"] = file_hash
-                                file_payload["payload"]["file_name"] = message.split()[1].split("/")[-1]
-                                file_payload["payload"]["data"] = blob
-                                file_payload["payload"]["end"] = False
-                                client_socket.send(json.dumps(file_payload).encode('utf-8'))
-                                n += 256
-                                # TODO: Add delay to prevent file corruption
-                            file_payload["type"] = "end_file"
-                            file_payload["payload"]["sender"] = sender
-                            file_payload["payload"]["room"] = room
-                            file_payload["payload"]["file_hash"] = file_hash
-                            file_payload["payload"]["file_name"] = message.split()[1].split("/")[-1]
-                            client_socket.send(json.dumps(file_payload).encode('utf-8'))
-                            file.close()
+                                n += 1
+                                client_socket.send((file_id + blob).encode("utf-8"))
+                            sleep(0.5)
+                            client_socket.send((file_id + "end").encode("utf-8"))
+                            message_payload = {}
                     except FileNotFoundError:
                         print("File not found.")
                 elif message.lower().split()[0] == '/download':

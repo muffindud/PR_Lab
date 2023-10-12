@@ -3,6 +3,7 @@ import threading
 import json
 import hashlib
 import base64
+from os import mkdir
 from time import sleep
 
 # Host parameters
@@ -10,6 +11,8 @@ HOST = '127.0.0.1'
 POST = 8080
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+file_queue = {}
 
 
 def hash_file(file_path: str):
@@ -32,19 +35,39 @@ def receive_message():
         message = client_socket.recv(1024).decode('utf-8')
 
         if message:
-            message_payload = json.loads(message)
-            # print(message_payload)
+            try:
+                message_payload = json.loads(message)
+                # print(message_payload)
 
-            if message_payload["type"] == "connect_ack":
-                print(message_payload["payload"]["message"])
-            elif message_payload["type"] == "notification":
-                print(message_payload["payload"]["message"])
-            elif message_payload["type"] == "message":
-                print(
-                    message_payload["payload"]["sender"] + "@" +
-                    message_payload["payload"]["room"] + ": " +
-                    message_payload["payload"]["text"]
-                )
+                if message_payload["type"] == "connect_ack":
+                    print(message_payload["payload"]["message"])
+                elif message_payload["type"] == "notification":
+                    print(message_payload["payload"]["message"])
+                elif message_payload["type"] == "message":
+                    print(
+                        message_payload["payload"]["sender"] + "@" +
+                        message_payload["payload"]["room"] + ": " +
+                        message_payload["payload"]["text"]
+                    )
+            except json.decoder.JSONDecodeError:
+                try:
+                    mkdir("local/" + message.split("@")[0])
+                except FileExistsError:
+                    pass
+                message_payload = message.split("@")
+                m_room = message_payload[0]
+                file_name = message_payload[1]
+                message_id = m_room + "@" + file_name
+                if message_id not in file_queue.keys():
+                    file_queue[message_id] = ""
+                if message_payload[2] != "end":
+                    file_queue[message_id] += message_payload[2]
+                else:
+
+                    with open("local/" + m_room + "/" + file_name, "wb") as file:
+                        file.write(base64.b64decode(file_queue[message_id].encode("utf-8")))
+                        file.close()
+                    del file_queue[message_id]
 
 
 def send_message():
@@ -115,13 +138,11 @@ def send_message():
                             blob_size = 1024 - len(file_id)
                             while True:
                                 blob = encoded_image[n * blob_size: (n + 1) * blob_size]
-                                # print("Enc: ", len(blob))
-                                # print("Blb: ", len(file_id + "@" + blob))
                                 if blob == "":
                                     break
                                 n += 1
                                 client_socket.send((file_id + blob).encode("utf-8"))
-                            sleep(0.5)
+                            sleep(0.2)
                             client_socket.send((file_id + "end").encode("utf-8"))
                             message_payload = {}
                     except FileNotFoundError:

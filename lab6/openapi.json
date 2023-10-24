@@ -1,0 +1,30 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Title",
+        "description": "Title",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api": {
+            "get": {
+                "summary": "Summary",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Summary",
+            }
+        }
+    }
+}

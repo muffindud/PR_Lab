@@ -1,57 +1,29 @@
-# routes.py
-from flask import jsonify, request
-from flask_restful import Api, Resource
-from __main__ import app, api, swagger
+from flask import jsonify
 
-from models.databse import db
+from __main__ import app
 from models.electro_scooter import ElectroScooter
 
 
-@app.route('/api/docs')
-def spec():
-    return jsonify(swagger(app))
+def template(scooter_id, scooter_name, scooter_battery_level):
+    return {
+        "id": scooter_id,
+        "name": scooter_name,
+        "battery_level": scooter_battery_level
+    }
 
 
-class ElectroScooters(Resource):
-    @swagger.operation(
-        notes='Get all electro scooters',
-        responseClass=ElectroScooter.__name__,
-        nickname='get',
-        parameters=[
-            {
-                "name": "id",
-                "description": "Electro scooter identifier",
-                "required": True,
-                "allowMultiple": False,
-                "dataType": 'int',
-                "paramType": "path"
-            }
-        ],
-        responseMessages=[
-            {
-                "code": 200,
-                "message": "Electro scooter found"
-            },
-            {
-                "code": 404,
-                "message": "Electro scooter not found"
-            }
-        ]
-    )
-    def get(self, id=None):
-        if id is None:
-            scooters = ElectroScooter.query.all()
-            return jsonify([scooter.serialize() for scooter in scooters])
-        else:
-            scooter = ElectroScooter.query.filter_by(id=id).first()
-            if scooter is None:
-                return {'message': 'Electro scooter not found'}, 404
-            else:
-                return jsonify(scooter.serialize())
-
-    def post(self):
-        ...
+@app.route('/api/electro_scooters', methods=['GET'])
+def get_all_electro_scooters():
+    scooters = ElectroScooter.query.all()
+    return jsonify([template(scooter.id, scooter.name, scooter.battery_level)] for scooter in scooters), 200
 
 
+@app.route('/api/electro_scooters/<int:id>', methods=['GET'])
+def get_electro_scooter_by_id(scooter_id):
+    scooter = ElectroScooter.query.get(scooter_id)
+    if scooter is None:
+        return jsonify({"error": "Electro scooter not found"}), 404
+    return jsonify(template(scooter.id, scooter.name, scooter.battery_level)), 200
 
 
+# @app.route('/api/electro_scooters', methods=['POST'])

@@ -1,0 +1,45 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Scooter API",
+        "description": "API for Scooters and whatever...",
+        "version": "1.69.420"
+    },
+    "paths": {
+        "/api/electro_scooters": {
+            "get": {
+                "summary": "Get all scooters",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "No scooters found"
+                    }
+                }
+            }
+        },
+        "/api/electro_scooters/{id}": {
+            "get": {
+                "summary": "Get scooter by id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Scooter id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Scooter not found"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -17,6 +17,11 @@ def main():
         sample_scooter_3 = ElectroScooter('Scooter 3', 69.0)
         sample_scooter_4 = ElectroScooter('Scooter 4', 42.0)
 
+        db.session.add(sample_scooter_1)
+        db.session.add(sample_scooter_2)
+        db.session.add(sample_scooter_3)
+        db.session.add(sample_scooter_4)
+
         db.session.commit()
 
 

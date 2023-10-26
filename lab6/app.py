@@ -7,6 +7,7 @@ from models.databse import db
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/{database_name}'
 
 SWAGGER_URL = '/api/docs'
 API_URL = '/static/openapi.json'
@@ -25,6 +26,7 @@ def main():
     app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 
     import routes
+    routes.init()
     app.run(debug=True)
 
 

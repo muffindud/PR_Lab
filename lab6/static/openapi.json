@@ -17,6 +17,28 @@
                         "description": "No scooters found"
                     }
                 }
+            },
+            "post": {
+                "summary": "Create new scooter",
+                "parameters": [
+                    {
+                        "name": "Scooter",
+                        "in": "body",
+                        "description": "Scooter object",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Scooter"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Scooter created"
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    }
+                }
             }
         },
         "/api/electro_scooters/{id}": {
@@ -40,6 +62,20 @@
                     }
                 }
             }
+        }
+    },
+    "definitions": {
+        "Scooter": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "battery_level": {
+                    "type": "number"
+                }
+            },
+            "description": "Scooter object"
         }
     }
 }

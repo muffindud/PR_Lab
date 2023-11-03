@@ -1,7 +1,7 @@
 # ./
 # main.py
-from link_retriever import get_links, absolute_home_link, relative_link
-from link_processor import send_link
+from src.link_retriever import get_links, absolute_home_link, relative_link
+from src.link_processor import send_link
 
 
 max_links = 5

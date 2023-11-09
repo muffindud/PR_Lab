@@ -6,6 +6,9 @@ import os
 import requests
 import bs4 as bs
 from json import dumps
+import threading
+
+instance_no = 5
 
 
 def get_tags(url):
@@ -28,7 +31,7 @@ def get_tags(url):
     return result
 
 
-def main():
+def consume():
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
 
@@ -54,6 +57,11 @@ def main():
 
     channel.basic_qos(prefetch_count=1)
     channel.start_consuming()
+
+
+def main():
+    for i in range(instance_no):
+        threading.Thread(target=consume).start()
 
 
 if __name__ == "__main__":

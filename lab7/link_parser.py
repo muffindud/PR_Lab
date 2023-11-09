@@ -1,7 +1,5 @@
 # ./
 # link_parser.py
-import json
-
 import pika
 import sys
 import os
@@ -9,6 +7,7 @@ import requests
 import bs4 as bs
 from json import dumps
 import threading
+
 
 instance_no = 5
 
@@ -24,7 +23,7 @@ def write_data(data: dict):
     channel.basic_publish(
         exchange='',
         routing_key='file_save',
-        body=json.dumps(data).encode()
+        body=dumps(data).encode()
     )
 
 
@@ -52,13 +51,6 @@ def consume(thread: str):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
 
-    # channel.exchange_declare(exchange='999', exchange_type='fanout')
-
-    # result = channel.queue_declare(queue='', exclusive=True)
-    # queue_name = result.method.queue
-
-    # channel.queue_bind(exchange='999', queue=queue_name)
-
     channel.queue_declare(queue='999', durable=True)
 
     print(f" [*] Waiting for messages on thread {thread}.")
@@ -72,7 +64,6 @@ def consume(thread: str):
             "tags": response
         })
 
-    # channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
     channel.basic_consume(
         queue='999',
         on_message_callback=callback,
@@ -83,14 +74,19 @@ def consume(thread: str):
     channel.start_consuming()
 
 
-def main():
-    for i in range(instance_no):
+def main(worker_threads: int = instance_no):
+    for i in range(worker_threads):
         threading.Thread(target=consume, args=str(i)).start()
 
 
 if __name__ == "__main__":
     try:
-        main()
+        if len(sys.argv) > 1:
+            print(f"Using {sys.argv[1]} thread(s).")
+            main(int(sys.argv[1]))
+        else:
+            print(f"No arguments provided, using {instance_no} thread(s).")
+            main()
     except KeyboardInterrupt:
         print('Interrupted')
         try:

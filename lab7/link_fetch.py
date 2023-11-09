@@ -3,6 +3,7 @@
 import pika
 import requests
 import bs4 as bs
+import sys
 
 
 absolute_home_link = "https://999.md"
@@ -59,16 +60,19 @@ def send_link(link):
     connection.close()
 
 
-def main():
-    links = get_links(absolute_home_link + relative_link, 1)
-    # print(links)
+def main(max_l: int = 0, start_page: int = 1):
+    links = get_links(absolute_home_link + relative_link, start_page)
 
-    if max_links != 0:
-        links = links[0:max_links]
+    if max_l != 0:
+        links = links[0:max_l]
 
     for link in links:
         send_link(link)
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main(int(sys.argv[1]), int(sys.argv[2]))
+    else:
+        print("Usage: link_fetch.py [max_links_to_parse] [starting_page]")
+        print("Arg: 0 - no limit")

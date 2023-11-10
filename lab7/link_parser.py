@@ -9,7 +9,7 @@ from json import dumps
 import threading
 
 
-instance_no = 5
+instance_no = 20
 
 
 def write_data(data: dict):
@@ -47,7 +47,8 @@ def get_tags(url):
     return result
 
 
-def consume(thread: str):
+def consume(thread: int):
+    thread = str(thread)
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
 
@@ -77,7 +78,7 @@ def consume(thread: str):
 
 def main(worker_threads: int = instance_no):
     for i in range(worker_threads):
-        threading.Thread(target=consume, args=str(i)).start()
+        threading.Thread(target=consume, args=(i,)).start()
 
 
 if __name__ == "__main__":

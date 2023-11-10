@@ -10,7 +10,7 @@ import threading
 
 
 product_queue = {}
-file_write_delay = 10
+file_write_delay = 5
 
 
 def write_to_file(key: str, prod: dict):

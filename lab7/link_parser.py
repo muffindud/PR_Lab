@@ -56,13 +56,14 @@ def consume(thread: str):
     print(f" [*] Waiting for messages on thread {thread}.")
 
     def callback(ch, method, properties, body):
-        print(f" [x] Received {body.decode()} on thread {thread}")
+        print(f" [x] Received {body.decode()} on thread {thread}.")
         response = get_tags(body.decode())
         name = body.decode().split('/')[-1]
         write_data({
             "name": name,
             "tags": response
         })
+        print(f" [x] Done on thread {thread} with {body.decode()}.")
 
     channel.basic_consume(
         queue='999',

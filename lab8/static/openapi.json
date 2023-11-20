@@ -39,6 +39,54 @@
                         "description": "Invalid input"
                     }
                 }
+            },
+            "put": {
+                "summary": "Update scooter",
+                "parameters": [
+                    {
+                        "name": "Scooter",
+                        "in": "body",
+                        "description": "Scooter object",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Scooter"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Scooter updated"
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    },
+                    "404": {
+                        "description": "Scooter not found"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete all scooters",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Scooter id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    },
+                    "404": {
+                        "description": "Scooter not found"
+                    }
+                }
             }
         },
         "/api/electro_scooters/{id}": {

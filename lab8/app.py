@@ -1,4 +1,5 @@
 # app.py
+
 from flask import Flask
 from flask_swagger_ui import get_swaggerui_blueprint
 
@@ -25,7 +26,7 @@ def main():
     )
     app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 
-    import routes
+    from src import routes
     routes.init()
     app.run(debug=True)
 

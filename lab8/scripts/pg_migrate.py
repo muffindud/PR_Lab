@@ -1,5 +1,5 @@
-# ./
-# pg_migrate.py
+# scripts/pg_migrate.py
+
 from sqlalchemy import create_engine, select
 from app import app
 

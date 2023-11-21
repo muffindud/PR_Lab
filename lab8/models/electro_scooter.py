@@ -1,4 +1,5 @@
 # models/electro_scooter.py
+
 from models.databse import db
 
 

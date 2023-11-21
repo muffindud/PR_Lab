@@ -1,4 +1,5 @@
-# init_db.py
+# scripts/init_db.py
+
 from app import app
 
 from models.databse import db

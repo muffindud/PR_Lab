@@ -1,5 +1,5 @@
-# ./
-# RAFT.py
+# src/RAFT.py
+
 from socket import socket, AF_INET, SOCK_DGRAM
 from json import dumps, loads
 

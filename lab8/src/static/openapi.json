@@ -37,6 +37,9 @@
                     },
                     "400": {
                         "description": "Invalid input"
+                    },
+                    "403": {
+                        "description": "Not allowed to add/modify data"
                     }
                 }
             },
@@ -60,6 +63,9 @@
                     "400": {
                         "description": "Invalid input"
                     },
+                    "403": {
+                        "description": "Not allowed to add/modify data"
+                    },
                     "404": {
                         "description": "Scooter not found"
                     }
@@ -82,6 +88,9 @@
                     },
                     "400": {
                         "description": "Invalid input"
+                    },
+                    "403": {
+                        "description": "Not allowed to add/modify data"
                     },
                     "404": {
                         "description": "Scooter not found"

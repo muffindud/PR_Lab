@@ -3,7 +3,6 @@
 from flask import jsonify, request
 
 from __main__ import app
-
 from models.databse import db
 from models.electro_scooter import ElectroScooter
 
@@ -41,6 +40,13 @@ def get_electro_scooter_by_id(scooter_id):
 def add_electro_scooter():
     try:
         data = request.get_json()
+
+        if app.config['ROLE'] != 'main':
+            if 'token' not in data.keys():
+                return jsonify({"error": "Backup server: Not allowed to change data."}), 403
+            if data['token'] != app.config['TOKEN']:
+                return jsonify({"error": "Invalid token"}), 403
+
         db.session.add(ElectroScooter(data['name'], data['battery_level']))
         db.session.commit()
         return jsonify({"message": "Electro scooter added successfully"}), 201
@@ -52,10 +58,18 @@ def add_electro_scooter():
 @app.route('/api/electro_scooters/<int:scooter_id>', methods=['PUT'])
 def update_electro_scooter(scooter_id):
     try:
+        data = request.get_json()
+
+        if app.config['ROLE'] != 'main':
+            if 'token' not in data.keys():
+                return jsonify({"error": "Backup server: Not allowed to change data."}), 403
+            if data['token'] != app.config['TOKEN']:
+                return jsonify({"error": "Invalid token"}), 403
+
         electro_scooter = ElectroScooter.query.get(scooter_id)
         if electro_scooter is None:
             return jsonify({"error": "Electro scooter not found"}), 404
-        data = request.get_json()
+
         electro_scooter.name = data['name']
         electro_scooter.battery_level = data['battery_level']
         db.session.commit()
@@ -68,9 +82,18 @@ def update_electro_scooter(scooter_id):
 @app.route('/api/electro_scooters/<int:scooter_id>', methods=['DELETE'])
 def delete_electro_scooter(scooter_id):
     try:
+        data = request.get_json()
+
+        if app.config['ROLE'] != 'main':
+            if 'token' not in data.keys():
+                return jsonify({"error": "Backup server: Not allowed to change data."}), 403
+            if data['token'] != app.config['TOKEN']:
+                return jsonify({"error": "Invalid token"}), 403
+
         electro_scooter = ElectroScooter.query.get(scooter_id)
         if electro_scooter is None:
             return jsonify({"error": "Electro scooter not found"}), 404
+
         db.session.delete(electro_scooter)
         db.session.commit()
         return jsonify({"message": "Electro scooter deleted successfully"}), 200

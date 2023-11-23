@@ -2,6 +2,7 @@
 
 from socket import socket, AF_INET, SOCK_DGRAM
 from json import dumps, loads
+import random
 
 
 class RAFT:
@@ -24,11 +25,13 @@ class RAFT:
             # Successful bind will assign "main" role
             self.socket.bind((self.host, self.port))
             self.role: str = "main"
-            print("Successfully bound socket to host and port, assigning main role")
+            self.token: str = str(random.randint(100000, 999999))
+            print(self.server_params["host"] + ":" + str(self.server_params["port"]) + ": Successfully bound socket to host and port, assigned main role")
 
             self.backup_params: list = []
             while len(self.backup_params) < self.instance_ct - 1:
-                print("Awaiting backup params from backup server")
+                print(self.server_params["host"] + ":" + str(self.server_params["port"]) + ": Awaiting backup params from backup server")
+                self.server_params["token"] = self.token
                 msg, addr = self.socket.recvfrom(1024)
                 msg = msg.decode()
 
@@ -39,10 +42,10 @@ class RAFT:
                 else:
                     # Received "backup" params
                     self.backup_params.append(loads(msg))
-                    print("Received backup params from backup server: ", msg)
+                    print(self.server_params["host"] + ":" + str(self.server_params["port"]) + ": Received backup params from backup server: ", msg)
 
         except:
-            print("Failed to bind socket to host and port, assigning backup role")
+            print(self.server_params["host"] + ":" + str(self.server_params["port"]) + ": Failed to bind socket to host and port, assigning backup role")
 
             # Unsuccessful bind will assign "backup" role
             self.role: str = "backup"
@@ -52,7 +55,7 @@ class RAFT:
 
             # Receive server params from server
             self.main_params: dict = loads(self.socket.recvfrom(1024)[0].decode())
-            print("Received main params from main server: ", self.main_params)
+            print(self.server_params["host"] + ":" + str(self.server_params["port"]) + ": Received main params from main server: ", self.main_params)
 
             # Send "backup" params to server
             self.socket.sendto(dumps(self.server_params).encode(), (self.host, self.port))

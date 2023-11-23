@@ -1,14 +1,14 @@
-# scripts/pg_migrate.py
+# pg_migrate.py
 
 from sqlalchemy import create_engine, select
-from app import app
+from src.FlaskInstance import app
 
 from models.databse import db
 from models.electro_scooter import ElectroScooter
 
 
 sqlite_engine = create_engine('sqlite:///instance/database.db')
-pg_engine = create_engine('postgresql://postgres:postgres@localhost:5432/scooters')
+# TODO: pg_engine = create_engine('postgresql://postgres:postgres@localhost:5432/scooters')
 
 
 def main():

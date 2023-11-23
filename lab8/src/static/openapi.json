@@ -18,6 +18,7 @@
                     }
                 }
             },
+
             "post": {
                 "summary": "Create new scooter",
                 "parameters": [
@@ -42,10 +43,44 @@
                         "description": "Not allowed to add/modify data"
                     }
                 }
+            }
+        },
+
+        "/api/electro_scooters/{id}": {
+            "get": {
+                "summary": "Get scooter by id",
+
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Scooter id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Scooter not found"
+                    }
+                }
             },
+
             "put": {
                 "summary": "Update scooter",
+
                 "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Scooter id",
+                        "required": true,
+                        "type": "integer"
+                    },
                     {
                         "name": "Scooter",
                         "in": "body",
@@ -56,6 +91,7 @@
                         }
                     }
                 ],
+
                 "responses": {
                     "200": {
                         "description": "Scooter updated"
@@ -71,8 +107,10 @@
                     }
                 }
             },
+
             "delete": {
-                "summary": "Delete all scooters",
+                "summary": "Delete scooter",
+
                 "parameters": [
                     {
                         "name": "id",
@@ -82,6 +120,7 @@
                         "type": "integer"
                     }
                 ],
+
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -97,38 +136,19 @@
                     }
                 }
             }
-        },
-        "/api/electro_scooters/{id}": {
-            "get": {
-                "summary": "Get scooter by id",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Scooter id",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "404": {
-                        "description": "Scooter not found"
-                    }
-                }
-            }
         }
     },
+
     "definitions": {
         "Scooter": {
             "properties": {
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Scooter 1"
                 },
                 "battery_level": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 100
                 }
             }
         }

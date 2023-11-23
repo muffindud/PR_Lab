@@ -16,13 +16,15 @@ class FlaskInstance:
             port: int,
             db_uri: str,
             role: str,
-            token: str
+            token: str,
+            follower_instances: list = None
     ):
         self.SWAGGER_URL: str = '/api/docs'
         self.API_URL: str = '/static/openapi.json'
         app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
         app.config['ROLE'] = role
         app.config['TOKEN'] = token
+        app.config['FOLLOWER_INSTANCES'] = follower_instances
 
         self.host: str = host
         self.port: int = port

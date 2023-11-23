@@ -1,5 +1,7 @@
 # src/routes.py
+from json import loads, dumps
 
+import requests
 from flask import jsonify, request
 
 from __main__ import app
@@ -44,13 +46,19 @@ def add_electro_scooter():
         if app.config['ROLE'] != 'main':
             if 'token' not in data.keys():
                 return jsonify({"error": "Backup server: Not allowed to change data."}), 403
-            if data['token'] != app.config['TOKEN']:
+            elif data['token'] != app.config['TOKEN']:
                 return jsonify({"error": "Invalid token"}), 403
+        else:
+            data = data.copy()
+            data['token'] = app.config['TOKEN']
+            for follower in app.config['FOLLOWER_INSTANCES']:
+                requests.post("http://" + follower['host'] + ":" + str(follower['port']) + "/api/electro_scooters", json=data)
 
         db.session.add(ElectroScooter(data['name'], data['battery_level']))
         db.session.commit()
         return jsonify({"message": "Electro scooter added successfully"}), 201
-    except:
+    except Exception as e:
+        print(e)
         return jsonify({"error": "Invalid JSON"}), 400
 
 
@@ -63,8 +71,13 @@ def update_electro_scooter(scooter_id):
         if app.config['ROLE'] != 'main':
             if 'token' not in data.keys():
                 return jsonify({"error": "Backup server: Not allowed to change data."}), 403
-            if data['token'] != app.config['TOKEN']:
+            elif data['token'] != app.config['TOKEN']:
                 return jsonify({"error": "Invalid token"}), 403
+        else:
+            data = data.copy()
+            data['token'] = app.config['TOKEN']
+            for follower in app.config['FOLLOWER_INSTANCES']:
+                requests.put("http://" + follower['host'] + ":" + str(follower['port']) + "/api/electro_scooters/" + str(scooter_id), json=data)
 
         electro_scooter = ElectroScooter.query.get(scooter_id)
         if electro_scooter is None:
@@ -82,13 +95,21 @@ def update_electro_scooter(scooter_id):
 @app.route('/api/electro_scooters/<int:scooter_id>', methods=['DELETE'])
 def delete_electro_scooter(scooter_id):
     try:
-        data = request.get_json()
+        try:
+            data = request.get_json()
+        except:
+            data = {}
 
         if app.config['ROLE'] != 'main':
             if 'token' not in data.keys():
                 return jsonify({"error": "Backup server: Not allowed to change data."}), 403
-            if data['token'] != app.config['TOKEN']:
+            elif data['token'] != app.config['TOKEN']:
                 return jsonify({"error": "Invalid token"}), 403
+        else:
+            data = data.copy()
+            data['token'] = app.config['TOKEN']
+            for follower in app.config['FOLLOWER_INSTANCES']:
+                requests.delete("http://" + follower['host'] + ":" + str(follower['port']) + "/api/electro_scooters/" + str(scooter_id), json=data)
 
         electro_scooter = ElectroScooter.query.get(scooter_id)
         if electro_scooter is None:

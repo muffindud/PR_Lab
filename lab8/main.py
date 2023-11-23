@@ -35,18 +35,28 @@ def main(flask_instance: int):
         raft_config["host"],
         raft_config["port"],
         raft_config["instance_ct"],
-        flask_configs[0]
-    ).server_params
+        flask_configs[flask_instance]
+    )
 
-    role = "main" if "token" in raft.keys() else "backup"
-    token = None if "token" not in raft.keys() else raft["token"]
+    flask_params = raft.server_params
+    # print(flask_params)
+
+    role = "main" if "token" in flask_params.keys() else "backup"
+    token = None if "token" not in flask_params.keys() else flask_params["token"]
+    token = token if token is not None else raft.main_params["token"]
+
+    follower_instances = None
+    if role == "main":
+        follower_instances = raft.backup_params
+        # print(follower_instances)
 
     flask_app = FlaskInstance(
         flask_configs[flask_instance]["host"],
         flask_configs[flask_instance]["port"],
         flask_configs[flask_instance]["db_uri"],
         role,
-        token
+        token,
+        follower_instances
     )
 
 

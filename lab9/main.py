@@ -6,10 +6,21 @@ app = ctk.CTk()
 
 
 def send():
+    recipient, subject, body = "", "", ""
+
     recipient = recipient_field.get()
     subject = subject_field.get()
     body = body_field.get("1.0", "end")
+
+    if recipient == "" or subject == "" or body == "":
+        return
+
     send_email(recipient, subject, body)
+    recipient_field.configure()
+
+    recipient_field.delete(0, "end")
+    subject_field.delete(0, "end")
+    body_field.delete("1.0", "end")
 
 
 recipient_field = ctk.CTkEntry(
